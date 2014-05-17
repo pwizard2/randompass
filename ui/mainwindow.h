@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QFont>
 
 namespace Ui {
 class MainWindow;
@@ -16,7 +17,14 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
+
+    void on_actionNew_Password_triggered();
+
+    void on_GeneratePassword_clicked();
+
+    void on_actionQuit_triggered();
+
+    void on_Tabinterface_currentChanged(int index);
 
 private:
     Ui::MainWindow *ui;
@@ -27,6 +35,7 @@ private:
     void SpawnSingle();
     void SpawnMulti();
     int PasswordStrength(QString passwd);
+    void AddtoHistory(QString passwd);
 
     // total passwords generated
     int numPasswds;

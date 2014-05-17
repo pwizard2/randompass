@@ -25,13 +25,17 @@
   <property name="windowTitle">
    <string>RandomPass 2.0</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../resources.qrc">
+    <normaloff>:/new/prefix1/img/randompass.png</normaloff>:/new/prefix1/img/randompass.png</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="margin">
      <number>3</number>
     </property>
     <item>
-     <widget class="QTabWidget" name="Tabs">
+     <widget class="QTabWidget" name="Tabinterface">
       <property name="maximumSize">
        <size>
         <width>600</width>
@@ -52,7 +56,7 @@
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Single</string>
+        <string>&amp;Single</string>
        </attribute>
        <attribute name="toolTip">
         <string>Generate a new password, just like original RandomPass</string>
@@ -98,6 +102,12 @@
              <size>
               <width>0</width>
               <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>360</width>
+              <height>16777215</height>
              </size>
             </property>
             <property name="font">
@@ -312,7 +322,7 @@
       </widget>
       <widget class="QWidget" name="Bulk">
        <attribute name="title">
-        <string>Multi</string>
+        <string>&amp;Batch</string>
        </attribute>
        <attribute name="toolTip">
         <string>Generate multiple Passwords</string>
@@ -329,17 +339,26 @@
           <item>
            <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>Number of passwords to generate</string>
+             <string>Number of passwords to generate:</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QSpinBox" name="spinBox_2">
+            <property name="suffix">
+             <string/>
+            </property>
             <property name="minimum">
              <number>2</number>
             </property>
             <property name="maximum">
              <number>100</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+            <property name="value">
+             <number>5</number>
             </property>
            </widget>
           </item>
@@ -360,34 +379,57 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="Analysis">
+      <widget class="QWidget" name="AnalysisTab">
        <attribute name="title">
-        <string>Analysis</string>
+        <string>&amp;Analysis</string>
        </attribute>
        <attribute name="toolTip">
         <string>Analyze the current password</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QPlainTextEdit" name="AnalysisBox"/>
+         <widget class="QTextBrowser" name="AnalysisBox">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
       <widget class="QWidget" name="History">
        <attribute name="title">
-        <string>History</string>
+        <string>&amp;History</string>
        </attribute>
        <attribute name="toolTip">
         <string>View previous passwords you created this session.</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QListWidget" name="HistoryList"/>
+         <widget class="QListWidget" name="HistoryList">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="flow">
+           <enum>QListView::LeftToRight</enum>
+          </property>
+          <property name="isWrapping" stdset="0">
+           <bool>true</bool>
+          </property>
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <property name="viewMode">
+           <enum>QListView::ListMode</enum>
+          </property>
+          <property name="uniformItemSizes">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_4">
+         <widget class="QLabel" name="PasswordCount">
           <property name="text">
-           <string>X passwords created during this session.</string>
+           <string>0 password(s) generated during this session.</string>
           </property>
          </widget>
         </item>
@@ -437,9 +479,9 @@
      </spacer>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="GeneratePassword">
       <property name="text">
-       <string>Generate New Password</string>
+       <string>Generate &amp;New Password</string>
       </property>
       <property name="autoDefault">
        <bool>true</bool>
@@ -452,7 +494,7 @@
     <item>
      <widget class="QPushButton" name="CopyButton">
       <property name="text">
-       <string>Copy to Clipboard</string>
+       <string>&amp;Copy to Clipboard</string>
       </property>
      </widget>
     </item>
@@ -516,6 +558,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

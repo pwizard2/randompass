@@ -1,13 +1,17 @@
-#include "mainwindow.h"
+#include "ui/mainwindow.h"
 #include "ui_mainwindow.h"
 #include <iostream>
 #include <qmessagebox.h>
 #include <ctime>
+#include <QListWidgetItem>
+#include <QFont>
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
 
     // total passwords generated
@@ -31,6 +35,13 @@ MainWindow::MainWindow(QWidget *parent) :
     lastLower='\0';
     lastNumber='\0';
     lastSymbol='\0';
+
+    // Version 1.1 bugfix:
+    // seed the random number generator based on current systime.
+    // This fixes the Windows bug from v1.0 where the password sequence is always the same.
+    // Linux was better at handling this for some reason so that's why it wasn't done for 1.0 release.
+    srand(time(0));
+
 
 }
 
@@ -219,7 +230,7 @@ QString MainWindow::Spawn_Next(){
 
     // enable clipboard button if it is not already active
     if(!ui->CopyButton->isEnabled()){
-       ui->CopyButton->setEnabled(true);
+        ui->CopyButton->setEnabled(true);
     }
 
     // get password length, add 7 to it to offset true list index and basic password length
@@ -361,7 +372,7 @@ QString MainWindow::Spawn_Next(){
 
     if(!useSpecial){
 
-             ui->PasswordOutput->setCursorPosition(1);
+        ui->PasswordOutput->setCursorPosition(1);
         ui->PasswordOutput->clear();
         ui->PasswordOutput->setMaxLength(length--);
 
@@ -372,41 +383,37 @@ QString MainWindow::Spawn_Next(){
     return pass;
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-    switch (ui->Tabs->currentIndex()) {
-    case 0:
-        SpawnSingle();
-        break;
-
-
-    }
-
-}
 
 //##################################################################################################3
 // Generate a single password
 void MainWindow::SpawnSingle(){
 
-     ui->StrengthMeter->setValue(0);
+    ui->StrengthMeter->setValue(0);
 
 
     QString pass=Spawn_Next();
-      ui->PasswordOutput->setText(pass);
+    ui->PasswordOutput->setText(pass);
 
-      // get password strength
-      int strength=PasswordStrength(pass);
-      ui->StrengthMeter->setValue(strength);
+    // get password strength
+    int strength=PasswordStrength(ui->PasswordOutput->text());
+    ui->StrengthMeter->setValue(strength);
+
+    //Add current password to History
+    AddtoHistory(ui->PasswordOutput->text());
 }
 
 
 
 //#################################################################################################
 // Calculate password strength (0-100) based on certain rules and return the score as an integer.
-// This code is directly from RoboJournal 0.5. Will Kraft 5/16/14.
+// This code is directly from RoboJournal 0.5, with only a few modifications. Will Kraft 5/16/14.
 //  --Will Kraft 5/29/13
 int MainWindow::PasswordStrength(QString passwd){
     using namespace std;
+
+    QStringList analysis;
+    analysis << "<html><head></head><body>";
+    analysis << "<h2>Analysis of <b>&quot;" + passwd + "</b>&quot;</h2><br>";
 
     int score=0;
     int len=passwd.length();
@@ -433,11 +440,18 @@ int MainWindow::PasswordStrength(QString passwd){
         int repeat_lc=passwd.count(lowercase_adj);
 
         if(repeat_lc > 0){
-            cout << "WARNING: Docking " << repeat_lc*len << " points from score because password has " << repeat_lc <<
-                    " adjacent lowercase letters."  << endl;
+            analysis << "WARNING: Docking " + QString::number(repeat_lc*len) + " points from score<br>because password has " +
+                        QString::number(repeat_lc) + " adjacent lowercase letters.<br><br>";
             score=score-(repeat_lc*len);
             total_deductions=total_deductions+(repeat_lc*len);
         }
+
+        //        //dock points for no symbols (added 5/17/14)
+        //        if(symbols==0){
+        //            cout << "WARNING: Docking 20 points from score because password has no symbols."  << endl;
+        //            score=score-20;
+        //            total_deductions=total_deductions+(score);
+        //        }
 
 
         // Dock points for adjacent uppercase letters
@@ -445,8 +459,8 @@ int MainWindow::PasswordStrength(QString passwd){
         int repeat_uc=passwd.count(uppercase_adj);
 
         if(repeat_uc > 0){
-            cout << "WARNING: Docking " << repeat_uc*len << " points from score because password has " << repeat_uc <<
-                    " adjacent uppercase letters."  << endl;
+            analysis << "WARNING: Docking " + QString::number(repeat_uc*len) + " points from score<br>because password has "
+                        + QString::number(repeat_uc) + " adjacent uppercase letters.<br><br>";
             score=score-(repeat_uc*len);
             total_deductions=total_deductions+(repeat_uc*len);
         }
@@ -457,8 +471,8 @@ int MainWindow::PasswordStrength(QString passwd){
         int repeat_int=passwd.count(int_consecutive);
 
         if(repeat_int > 0){
-            cout << "WARNING: Docking " << repeat_int*len << " points from score because password has " << repeat_int <<
-                    " adjacent integers."  << endl;
+            analysis << "WARNING: Docking " + QString::number(repeat_int*len) + " points from score<br>because password has " +
+                        QString::number(repeat_int) + " adjacent integers.<br><br>";
             score=score-(repeat_int*len);
             total_deductions=total_deductions+(repeat_int*len);
         }
@@ -472,8 +486,8 @@ int MainWindow::PasswordStrength(QString passwd){
             int num_dupes=passwd.count(var1);
 
             if(num_dupes >= 2){
-                cout << "WARNING: Docking " << num_dupes * 4 << " points from score because password has " << num_dupes <<
-                        " occurrences of " << var1.toStdString() << "." << endl;
+                analysis << "WARNING: Docking " + QString::number(num_dupes * 4) + " points from score<br>because password has "
+                            +  QString::number(num_dupes) +  " occurrences of &quot;" + var1 + "&quot;.<br><br>";
                 score=score-(num_dupes * 4);
 
                 total_deductions=total_deductions+(num_dupes * 4);
@@ -489,8 +503,8 @@ int MainWindow::PasswordStrength(QString passwd){
             int alpha_dupes=passwd.count(var2,Qt::CaseInsensitive);
 
             if(alpha_dupes >= 2){
-                cout << "WARNING: Docking " << alpha_dupes * 4 << " points from score because password has " << alpha_dupes <<
-                        " occurrences of " << var2.toStdString() << "." << endl;
+                analysis << "WARNING: Docking "  + QString::number(alpha_dupes * 4) + " points from score\nbecause password has "
+                            + QString::number(alpha_dupes) + " occurrences of &quot;" + var2 + "&quot;.<br><br>";
                 score=score-(alpha_dupes * 4);
 
                 total_deductions=total_deductions+(alpha_dupes * 4);
@@ -506,13 +520,15 @@ int MainWindow::PasswordStrength(QString passwd){
             int sym_dupes=passwd.count(var3);
 
             if(sym_dupes >= 2){
-                cout << "WARNING: Docking " << sym_dupes * 4 << " points from score because password has " << sym_dupes <<
-                        " occurrences of " << var3.toStdString() << "." << endl;
+                analysis << "WARNING: Docking " + QString::number(sym_dupes * 4) + " points from score<br>because password has " +
+                            QString::number(sym_dupes) + " occurrences of &quot;" + var3 + "&quot;.<br><br>";
                 score=score-(sym_dupes * 4);
 
                 total_deductions=total_deductions+(sym_dupes * 4);
             }
         }
+
+        int raw_score=score;
 
         // prevent score from going out of range
         if(score>100){
@@ -523,14 +539,86 @@ int MainWindow::PasswordStrength(QString passwd){
             score=0;
         }
 
+        if(total_deductions==0)
+            analysis << "No issues to report.<br>";
+
         // make sure the score is a whole integer w/o decimals
         score=qRound(score);
 
-        cout << "================================================================================" << endl;
-        cout << "Total Point Deductions: " << total_deductions << " / 100 " << endl;
+        analysis << "<hr>";
+        analysis << "Raw score: " + QString::number(raw_score) + " points.<br>";
+        analysis << "Total deductions: " + QString::number(total_deductions) + " point(s).<br><br>";
+
+        analysis << "<b>Total adjusted score: " + QString::number(score) + "/100 points.</b><br><br>";
+        analysis << "</body></html>";
+
+        ui->AnalysisBox->setHtml(analysis.join("\n"));
+
+        //Change the analysis tab header so people knmow if there are problems
+        if(total_deductions > 0){
+
+            ui->Tabinterface->setTabText(2,"Analysis [WARNING]");
+        }
+        else{
+              ui->Tabinterface->setTabText(2,"Analysis");
+        }
+
     }
+
 
     return score;
 }
 
 //###########################################################################################################
+
+void MainWindow::on_actionNew_Password_triggered()
+{
+    ui->GeneratePassword->click();
+}
+
+//###########################################################################################################
+// This is what happens when the user clicks the Generate Password default button.
+void MainWindow::on_GeneratePassword_clicked()
+{
+    switch (ui->Tabinterface->currentIndex()) {
+    case 0:
+        ui->AnalysisBox->clear();
+        SpawnSingle();
+
+        break;
+
+
+    }
+}
+
+//###########################################################################################################
+void MainWindow::AddtoHistory(QString passwd){
+
+    QListWidgetItem *next_item=new QListWidgetItem();
+    QFont passfont("Consolas",16);
+
+    next_item->setText(passwd);
+    next_item->setFont(passfont);
+    ui->HistoryList->insertItem(0,next_item);
+
+    //count the passwords
+    ui->PasswordCount->setText(QString::number(ui->HistoryList->count()) + " password(s) generated this session.");
+}
+
+//###########################################################################################################
+void MainWindow::on_actionQuit_triggered()
+{
+    exit(0);
+}
+
+//###########################################################################################################
+void MainWindow::on_Tabinterface_currentChanged(int index)
+{
+    if(index==2 || index==3){
+        ui->GeneratePassword->setDisabled(true);
+    }
+    else{
+        ui->GeneratePassword->setDisabled(false);
+
+    }
+}
