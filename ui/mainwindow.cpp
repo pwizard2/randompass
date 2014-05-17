@@ -507,11 +507,11 @@ int MainWindow::PasswordStrength(QString passwd){
             int num_dupes=passwd.count(var1);
 
             if(num_dupes >= 2){
-                analysis << "WARNING: Docking " + QString::number(num_dupes * 4) + " points from score<br>because password has "
+                analysis << "WARNING: Docking " + QString::number(num_dupes * 5) + " points from score<br>because password has "
                             +  QString::number(num_dupes) +  " occurrences of &quot;" + var1 + "&quot;.<br><br>";
-                score=score-(num_dupes * 4);
+                score=score-(num_dupes * 5);
 
-                total_deductions=total_deductions+(num_dupes * 4);
+                total_deductions=total_deductions+(num_dupes * 5);
             }
         }
 
@@ -524,11 +524,11 @@ int MainWindow::PasswordStrength(QString passwd){
             int alpha_dupes=passwd.count(var2,Qt::CaseInsensitive);
 
             if(alpha_dupes >= 2){
-                analysis << "WARNING: Docking "  + QString::number(alpha_dupes * 4) + " points from score\nbecause password has "
+                analysis << "WARNING: Docking "  + QString::number(alpha_dupes * 5) + " points from score\nbecause password has "
                             + QString::number(alpha_dupes) + " occurrences of &quot;" + var2 + "&quot;.<br><br>";
-                score=score-(alpha_dupes * 4);
+                score=score-(alpha_dupes * 5);
 
-                total_deductions=total_deductions+(alpha_dupes * 4);
+                total_deductions=total_deductions+(alpha_dupes * 5);
             }
         }
 
@@ -541,11 +541,11 @@ int MainWindow::PasswordStrength(QString passwd){
             int sym_dupes=passwd.count(var3);
 
             if(sym_dupes >= 2){
-                analysis << "WARNING: Docking " + QString::number(sym_dupes * 4) + " points from score<br>because password has " +
+                analysis << "WARNING: Docking " + QString::number(sym_dupes * 5) + " points from score<br>because password has " +
                             QString::number(sym_dupes) + " occurrences of &quot;" + var3 + "&quot;.<br><br>";
-                score=score-(sym_dupes * 4);
+                score=score-(sym_dupes * 5);
 
-                total_deductions=total_deductions+(sym_dupes * 4);
+                total_deductions=total_deductions+(sym_dupes * 5);
             }
         }
 
@@ -572,12 +572,12 @@ int MainWindow::PasswordStrength(QString passwd){
             strength="<span style=\"color: darkred; font-weight: bold\">Insecure</span>";
 
         if((raw_score >= 55) && (score < 75))
-            strength="<span style=\"color: darkgoldenrod; font-weight: bold\">Nominal</span>";
+            strength="<span style=\"color: darkorange; font-weight: bold\">Nominal</span>";
 
         if((raw_score >= 75) && (score < 90))
-            strength="<span style=\"color: limegreen; font-weight: bold\">Adequate</span>";
+            strength="<span style=\"color: olive; font-weight: bold\">Adequate</span>";
 
-        if((raw_score > 91) && (score < 100))
+        if((raw_score >= 90) && (score < 100))
             strength="<span style=\"color: darkgreen; font-weight: bold\">Secure</span>";
 
         if((raw_score >= 100))
@@ -596,11 +596,12 @@ int MainWindow::PasswordStrength(QString passwd){
 
         //Change the analysis tab header so people knmow if there are problems
         if(total_deductions > 0){
-
-            ui->Tabinterface->setTabText(2,"Analysis [WARNING]");
+            QIcon warn(":/new/prefix1/img/exclamation--frame.png");
+            ui->Tabinterface->setTabIcon(2, warn);
         }
         else{
-              ui->Tabinterface->setTabText(2,"Analysis");
+            // Set an empty icon if there is nothing wrong with the password.
+            ui->Tabinterface->setTabIcon(2,QIcon());
         }
 
     }

@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/new/prefix1">
         <file>img/randompass.png</file>
+        <file>img/exclamation--frame.png</file>
     </qresource>
 </RCC>
