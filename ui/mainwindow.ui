@@ -449,7 +449,7 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Strength</string>
+         <string>Score</string>
         </property>
        </widget>
       </item>
@@ -457,6 +457,12 @@
        <widget class="QProgressBar" name="StrengthMeter">
         <property name="value">
          <number>0</number>
+        </property>
+        <property name="invertedAppearance">
+         <bool>false</bool>
+        </property>
+        <property name="format">
+         <string> %p/100</string>
         </property>
        </widget>
       </item>

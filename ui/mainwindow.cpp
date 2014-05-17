@@ -1,3 +1,24 @@
+/*
+    This file is part of Randompass.
+    Copyright (c) 2014 by Will Kraft <pwizard@gmail.com>.
+
+    Randompass 2.0 and later contains GPL3 code from RoboJournal 0.5.
+
+    Randompass is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Randompass is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Randompass.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 #include "ui/mainwindow.h"
 #include "ui_mainwindow.h"
 #include <iostream>
@@ -413,7 +434,7 @@ int MainWindow::PasswordStrength(QString passwd){
 
     QStringList analysis;
     analysis << "<html><head></head><body>";
-    analysis << "<h2>Analysis of <b>&quot;" + passwd + "</b>&quot;</h2><br>";
+    analysis << "<h2>Strength Analysis of <b>&quot;" + passwd + "</b>&quot;</h2><br>";
 
     int score=0;
     int len=passwd.length();
@@ -544,10 +565,29 @@ int MainWindow::PasswordStrength(QString passwd){
 
         // make sure the score is a whole integer w/o decimals
         score=qRound(score);
+        QString strength="Weak";
+
+        // give strength rating
+        if(raw_score < 55)
+            strength="<span style=\"color: darkred; font-weight: bold\">Insecure</span>";
+
+        if((raw_score >= 55) && (score < 75))
+            strength="<span style=\"color: darkgoldenrod; font-weight: bold\">Nominal</span>";
+
+        if((raw_score >= 75) && (score < 90))
+            strength="<span style=\"color: limegreen; font-weight: bold\">Adequate</span>";
+
+        if((raw_score > 91) && (score < 100))
+            strength="<span style=\"color: darkgreen; font-weight: bold\">Secure</span>";
+
+        if((raw_score >= 100))
+            strength="<span style=\"color: darkgreen; font-weight: bold\">Exceptional</span>";
+
 
         analysis << "<hr>";
         analysis << "Raw score: " + QString::number(raw_score) + " points.<br>";
-        analysis << "Total deductions: " + QString::number(total_deductions) + " point(s).<br><br>";
+        analysis << "Total deductions: " + QString::number(total_deductions) + " point(s).<br>";
+        analysis << "Strength rating: " + strength + "<br><br>";
 
         analysis << "<b>Total adjusted score: " + QString::number(score) + "/100 points.</b><br><br>";
         analysis << "</body></html>";
