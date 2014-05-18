@@ -23,6 +23,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QListWidgetItem>
 
 
 namespace Ui {
@@ -47,6 +48,12 @@ private slots:
 
     void on_Tabinterface_currentChanged(int index);
 
+     void on_HistoryList_itemDoubleClicked(QListWidgetItem *item);
+
+     void on_BatchList_itemDoubleClicked(QListWidgetItem *item);
+
+     void on_CopyButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -57,6 +64,7 @@ private:
     void SpawnMulti();
     int PasswordStrength(QString passwd);
     void AddtoHistory(QString passwd);
+    void Copy();
 
     // total passwords generated
     int numPasswds;

@@ -26,6 +26,7 @@
 #include <ctime>
 #include <QListWidgetItem>
 #include <QFont>
+#include <QClipboard>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -62,6 +63,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // This fixes the Windows bug from v1.0 where the password sequence is always the same.
     // Linux was better at handling this for some reason so that's why it wasn't done for 1.0 release.
     srand(time(0));
+
+    QFont passfont("Consolas",16);
+    ui->BatchList->setFont(passfont);
+    ui->HistoryList->setFont(passfont);
 
 
 }
@@ -618,6 +623,27 @@ void MainWindow::on_actionNew_Password_triggered()
 }
 
 //###########################################################################################################
+void MainWindow::SpawnMulti(){
+
+    ui->BatchList->clear();
+    ui->PasswordOutput->clear();
+
+    QStringList batch;
+
+    for(int i=0; i < ui->PasswordNumber->value(); i++){
+
+        //Calling Spawn_Next doesn't work correctly for some reason, so a short-term fix is to run
+        // Spawn_single a bunch of times.
+        SpawnSingle();
+        QString next=ui->PasswordOutput->text();
+        batch << next;
+    }
+
+    ui->BatchList->insertItems(0,batch);
+    ui->PasswordOutput->clear();
+}
+
+//###########################################################################################################
 // This is what happens when the user clicks the Generate Password default button.
 void MainWindow::on_GeneratePassword_clicked()
 {
@@ -626,6 +652,10 @@ void MainWindow::on_GeneratePassword_clicked()
         ui->AnalysisBox->clear();
         SpawnSingle();
 
+        break;
+
+    case 1:
+        SpawnMulti();
         break;
 
 
@@ -660,6 +690,90 @@ void MainWindow::on_Tabinterface_currentChanged(int index)
     }
     else{
         ui->GeneratePassword->setDisabled(false);
+
+    }
+}
+
+//###########################################################################################################
+// Double-click to analyze any item on the history list.
+void MainWindow::on_HistoryList_itemDoubleClicked(QListWidgetItem *item)
+{
+
+    QString pw=item->text();
+    QMessageBox m;
+    int choice=m.question(this,"Randompass","Do you want Randompass to analyze this password? (" + pw + ")",
+                          QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+
+    switch(choice){
+    case QMessageBox::Yes:
+
+        // get password strength
+        int strength=PasswordStrength(pw);
+        ui->StrengthMeter->setValue(strength);
+        ui->Tabinterface->setCurrentIndex(2);
+
+        // clear out single mode stuff.
+        ui->PasswordOutput->clear();
+
+        break;
+    }
+}
+
+//###########################################################################################################
+// Double-click any itenm on the Batch list.
+void MainWindow::on_BatchList_itemDoubleClicked(QListWidgetItem *item)
+{
+    QString pw=item->text();
+    QMessageBox m;
+    int choice=m.question(this,"Randompass","Do you want Randompass to analyze this password? (" + pw + ")",
+                          QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+
+    switch(choice){
+    case QMessageBox::Yes:
+
+        // get password strength
+        int strength=PasswordStrength(pw);
+        ui->StrengthMeter->setValue(strength);
+        ui->Tabinterface->setCurrentIndex(2);
+
+        // clear out single mode stuff.
+        ui->PasswordOutput->clear();
+
+        break;
+    }
+}
+
+void MainWindow::on_CopyButton_clicked()
+{
+    Copy();
+}
+
+void MainWindow::Copy(){
+
+    QMessageBox m;
+    QStringList passlist;
+
+    QClipboard* clip=QApplication::clipboard();
+
+    int active=ui->Tabinterface->currentIndex();
+
+    // copy single (default)
+    if(active==0){
+        ui->PasswordOutput->selectAll();
+        ui->PasswordOutput->copy();
+        m.information(this,"Randompass","Password stored in system clipboard.");
+    }
+    if(active==1){// somebody tries to copy multi
+
+        QListWidgetItem *current=ui->BatchList->currentItem();
+        clip->setText(current->text());
+        m.information(this,"Randompass","Selected password stored in system clipboard.");
+    }
+
+    if(active==2){ //someone copies while analysis is active
+    }
+
+    if(active==3){
 
     }
 }
