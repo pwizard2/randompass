@@ -54,6 +54,12 @@ private slots:
 
      void on_CopyButton_clicked();
 
+     void on_HistoryList_currentItemChanged(QListWidgetItem *current);
+
+     void on_BatchList_currentItemChanged(QListWidgetItem *current);
+
+     void on_PasswordNumber_valueChanged(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
 

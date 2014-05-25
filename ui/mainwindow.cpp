@@ -685,12 +685,22 @@ void MainWindow::on_actionQuit_triggered()
 //###########################################################################################################
 void MainWindow::on_Tabinterface_currentChanged(int index)
 {
+
+    if(index==0){
+        ui->GeneratePassword->setText("Generate New Password");
+         ui->GeneratePassword->setDisabled(false);
+
+    }
+
+
+    if(index==1){
+        ui->GeneratePassword->setText("Generate " + ui->PasswordNumber->text() + " New Passwords");
+         ui->GeneratePassword->setDisabled(false);
+    }
+
     if(index==2 || index==3){
         ui->GeneratePassword->setDisabled(true);
-    }
-    else{
-        ui->GeneratePassword->setDisabled(false);
-
+        ui->GeneratePassword->setText("Generate New Password");
     }
 }
 
@@ -776,4 +786,30 @@ void MainWindow::Copy(){
     if(active==3){
 
     }
+}
+
+void MainWindow::on_HistoryList_currentItemChanged(QListWidgetItem *current)
+{
+    // get password strength
+    QString pw=current->text();
+    int strength=PasswordStrength(pw);
+    ui->StrengthMeter->setValue(strength);
+    ui->BatchList->clearSelection();
+    ui->PasswordOutput->clear();
+
+}
+
+void MainWindow::on_BatchList_currentItemChanged(QListWidgetItem *current)
+{
+    // get password strength
+    QString pw=current->text();
+    int strength=PasswordStrength(pw);
+    ui->StrengthMeter->setValue(strength);
+    ui->HistoryList->clearSelection();
+    ui->PasswordOutput->clear();
+}
+
+void MainWindow::on_PasswordNumber_valueChanged(const QString &arg1)
+{
+    ui->GeneratePassword->setText("Generate " + arg1 + " New Passwords");
 }

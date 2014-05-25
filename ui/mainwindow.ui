@@ -158,7 +158,7 @@
         <item>
          <widget class="QGroupBox" name="groupBox">
           <property name="title">
-           <string>Single Password Options</string>
+           <string>Single and Batch Password Settings</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
@@ -358,11 +358,14 @@
           </item>
           <item>
            <widget class="QSpinBox" name="PasswordNumber">
+            <property name="toolTip">
+             <string>Generate between 5-100 passwords at once.</string>
+            </property>
             <property name="suffix">
              <string/>
             </property>
             <property name="minimum">
-             <number>2</number>
+             <number>5</number>
             </property>
             <property name="maximum">
              <number>100</number>
