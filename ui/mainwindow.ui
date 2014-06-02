@@ -508,8 +508,18 @@
     </item>
     <item>
      <widget class="QPushButton" name="GeneratePassword">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
       <property name="text">
        <string>Generate &amp;New Password</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../resources.qrc">
+        <normaloff>:/new/prefix1/img/gear.png</normaloff>:/new/prefix1/img/gear.png</iconset>
       </property>
       <property name="autoDefault">
        <bool>true</bool>
@@ -559,6 +569,10 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNew_Password">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/new/prefix1/img/gear.png</normaloff>:/new/prefix1/img/gear.png</iconset>
+   </property>
    <property name="text">
     <string>New Password</string>
    </property>

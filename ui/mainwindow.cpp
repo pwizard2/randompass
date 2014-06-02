@@ -614,14 +614,20 @@ int MainWindow::PasswordStrength(QString passwd){
 
         ui->AnalysisBox->setHtml(analysis.join("\n"));
 
-        //Change the analysis tab header so people knmow if there are problems
+
+
+        //Change the analysis tab header so people know if there are problems
+
+        QIcon warn(":/new/prefix1/img/exclamation--frame.png");
+        QIcon ok(":/new/prefix1/img/tick-button.png");
+
         if(total_deductions > 0){
-            QIcon warn(":/new/prefix1/img/exclamation--frame.png");
+
             ui->Tabinterface->setTabIcon(2, warn);
         }
         else{
             // Set an empty icon if there is nothing wrong with the password.
-            ui->Tabinterface->setTabIcon(2,QIcon());
+            ui->Tabinterface->setTabIcon(2,ok);
         }
 
     }

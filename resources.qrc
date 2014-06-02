@@ -2,5 +2,8 @@
     <qresource prefix="/new/prefix1">
         <file>img/randompass.png</file>
         <file>img/exclamation--frame.png</file>
+        <file>img/tick-button.png</file>
+        <file>img/gear.png</file>
+        <file>img/clipboard-text.png</file>
     </qresource>
 </RCC>
