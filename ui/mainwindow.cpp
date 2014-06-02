@@ -62,11 +62,15 @@ MainWindow::MainWindow(QWidget *parent) :
     // seed the random number generator based on current systime.
     // This fixes the Windows bug from v1.0 where the password sequence is always the same.
     // Linux was better at handling this for some reason so that's why it wasn't done for 1.0 release.
-    srand(time(0));
+    srand(time(NULL));
 
     QFont passfont("Consolas",16);
     ui->BatchList->setFont(passfont);
     ui->HistoryList->setFont(passfont);
+
+    message=new QLabel();
+    message->setText("Press your <b>Enter</b> key to begin.");
+    ui->statusBar->addPermanentWidget(message,1);
 
 
 }
@@ -84,10 +88,10 @@ int MainWindow::DiceRoll(bool useSpecial){
     int thisroll='\0';
 
     if(useSpecial){
-        thisroll=rand() %4;
+        thisroll=rand() %4; //previously 4
     }
     else{
-        thisroll=rand() %3;
+        thisroll=rand() %3; // previously 3
     }
 
 
@@ -102,8 +106,13 @@ char MainWindow::NextDigit(bool useSpecial, int thisroll){
     int choice;
 
     char seedupper[]="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    char seedlower[]="abcdefghijklmnopqrstuvwxyz";
-    char seednumber[]="0123456789";
+
+    // Bugfix for 0.2: reverse string to solve problems of adjacent upper and lowercase chars --Will Kraft (6/1/14).
+    char seedlower[]="zyxwvutsrqponmlkjihgfedcba";
+
+    // Transpose number arry to randomize things a bit more --Will Kraft (6/1/14).
+    char seednumber[]="5678901234";
+
     char seedsymbol[]="~`!@#$%^&*()-_+=:;?/"; // count=20
 
     if(useSpecial){
@@ -243,7 +252,9 @@ char MainWindow::NextDigit(bool useSpecial, int thisroll){
 
 
         }
+
     }
+
 
     return nextchar;
 
@@ -290,6 +301,7 @@ QString MainWindow::Spawn_Next(){
             // roll the dice...
             thisroll=DiceRoll(1);
 
+
             // if the same number comes up twice in a row, keep rolling until we get something different
             while(thisroll==lastroll){
                 thisroll=DiceRoll(1);
@@ -298,9 +310,12 @@ QString MainWindow::Spawn_Next(){
             // keep track of the last number rolled
             lastroll=thisroll;
 
-
             // Pick a glyph based on the dice roll
-            nextchar=NextDigit(1,thisroll);
+            // 2.0 fix: Go through X iterations based on the number of jumps.
+            for( int i=ui->Jumps->value(); i > 0; i--){
+                nextchar=NextDigit(1,thisroll);
+                //cout << "Completed one iteration, only "<<  i <<  " left to go. "<< endl;
+            }
 
             //and add it to the main password array
             password[count]=nextchar;
@@ -625,8 +640,12 @@ void MainWindow::on_actionNew_Password_triggered()
 //###########################################################################################################
 void MainWindow::SpawnMulti(){
 
+    ui->BatchList->clearSelection();
+    ui->BatchList->clearFocus();
+    ui->HistoryList->clearSelection();
     ui->BatchList->clear();
     ui->PasswordOutput->clear();
+
 
     QStringList batch;
 
@@ -647,11 +666,15 @@ void MainWindow::SpawnMulti(){
 // This is what happens when the user clicks the Generate Password default button.
 void MainWindow::on_GeneratePassword_clicked()
 {
+
+    ui->BatchList->clearSelection();
+    ui->BatchList->clearFocus();
+
     switch (ui->Tabinterface->currentIndex()) {
     case 0:
         ui->AnalysisBox->clear();
         SpawnSingle();
-
+        message->setText("Completed analysis of <b>" + ui->PasswordOutput->text() + "</b>");
         break;
 
     case 1:
@@ -665,6 +688,9 @@ void MainWindow::on_GeneratePassword_clicked()
 //###########################################################################################################
 void MainWindow::AddtoHistory(QString passwd){
 
+    // add one to offset Qt's habit of making 0 the first number
+    int count=ui->HistoryList->count()+1;
+
     QListWidgetItem *next_item=new QListWidgetItem();
     QFont passfont("Consolas",16);
 
@@ -673,7 +699,10 @@ void MainWindow::AddtoHistory(QString passwd){
     ui->HistoryList->insertItem(0,next_item);
 
     //count the passwords
-    ui->PasswordCount->setText(QString::number(ui->HistoryList->count()) + " password(s) generated this session.");
+    ui->PasswordCount->setText(QString::number(count) + " password(s) generated this session.");
+
+    //display count on History tab.
+    ui->Tabinterface->setTabText(3,"History (" + QString::number(count) + ")");
 }
 
 //###########################################################################################################
@@ -688,14 +717,14 @@ void MainWindow::on_Tabinterface_currentChanged(int index)
 
     if(index==0){
         ui->GeneratePassword->setText("Generate New Password");
-         ui->GeneratePassword->setDisabled(false);
+        ui->GeneratePassword->setDisabled(false);
 
     }
 
 
     if(index==1){
         ui->GeneratePassword->setText("Generate " + ui->PasswordNumber->text() + " New Passwords");
-         ui->GeneratePassword->setDisabled(false);
+        ui->GeneratePassword->setDisabled(false);
     }
 
     if(index==2 || index==3){
@@ -788,28 +817,40 @@ void MainWindow::Copy(){
     }
 }
 
-void MainWindow::on_HistoryList_currentItemChanged(QListWidgetItem *current)
-{
-    // get password strength
-    QString pw=current->text();
-    int strength=PasswordStrength(pw);
-    ui->StrengthMeter->setValue(strength);
-    ui->BatchList->clearSelection();
-    ui->PasswordOutput->clear();
-
-}
-
-void MainWindow::on_BatchList_currentItemChanged(QListWidgetItem *current)
-{
-    // get password strength
-    QString pw=current->text();
-    int strength=PasswordStrength(pw);
-    ui->StrengthMeter->setValue(strength);
-    ui->HistoryList->clearSelection();
-    ui->PasswordOutput->clear();
-}
 
 void MainWindow::on_PasswordNumber_valueChanged(const QString &arg1)
 {
     ui->GeneratePassword->setText("Generate " + arg1 + " New Passwords");
+}
+
+void MainWindow::on_BatchList_itemClicked(QListWidgetItem *item)
+{
+    // get password strength
+    QString pw=item->text();
+    int strength=PasswordStrength(pw);
+    ui->StrengthMeter->setValue(strength);
+    ui->HistoryList->clearSelection();
+    ui->PasswordOutput->clear();
+    message->setText("Completed analysis of <b>" + pw + "</b>");
+}
+
+void MainWindow::on_HistoryList_itemClicked(QListWidgetItem *item)
+{
+    // get password strength
+    QString pw=item->text();
+    int strength=PasswordStrength(pw);
+    ui->StrengthMeter->setValue(strength);
+    ui->BatchList->clearSelection();
+    ui->PasswordOutput->clear();
+    message->setText("Completed analysis of <b>" + pw + "</b>");
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    QMessageBox::about(this, "About Randompass",
+    "<html><h1>Randompass 2.0</h1><b>A strong, randomized password generator based on Qt4 for Windows, Mac, and Linux.</b>"
+                       "<hr><br>Copyright &copy; 2014 by Will Kraft. &lt;pwizard@gmail.com&gt;<br><a href=\"http://sourceforge.net"
+                       "/projects/randompass\">http://sourceforge.net/projects/randompass</a><br><br>This program is free "
+                       "software provided under the terms of the GNU General Public License 3.<br><br>Some icons by "
+                       "<a href=\"http://p.yusukekamiyamane.com/\">Yusuke Kamiyamane</a>.<br>");
 }

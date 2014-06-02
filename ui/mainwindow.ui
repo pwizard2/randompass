@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>360</width>
-    <height>364</height>
+    <height>377</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>RandomPass 2.0</string>
+   <string>Randompass 2.0</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../resources.qrc">
@@ -117,7 +117,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Press Enter to Begin...</string>
+             <string/>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -283,20 +283,26 @@
              <item>
               <widget class="QLabel" name="label_3">
                <property name="text">
-                <string>Set number of jumps to final password</string>
+                <string>Set number of dice rolls </string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="spinBox">
+              <widget class="QSpinBox" name="Jumps">
                <property name="maximumSize">
                 <size>
                  <width>50</width>
                  <height>16777215</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>&lt;P&gt;Want some extra randomness? This value controls how many times Randompass rolls the dice to select the next character in the password. For instance, setting this value to &quot;10&quot; causes Randompass to pick the next character 10 times  (discarding the results from the first 9 rolls).&lt;/p&gt;</string>
+               </property>
                <property name="minimum">
                 <number>1</number>
+               </property>
+               <property name="value">
+                <number>3</number>
                </property>
               </widget>
              </item>
@@ -368,7 +374,7 @@
              <number>5</number>
             </property>
             <property name="maximum">
-             <number>100</number>
+             <number>1000</number>
             </property>
             <property name="singleStep">
              <number>5</number>
@@ -533,10 +539,11 @@
    </property>
    <widget class="QMenu" name="menuPassword">
     <property name="title">
-     <string>Password</string>
+     <string>Randompass</string>
     </property>
     <addaction name="actionNew_Password"/>
     <addaction name="separator"/>
+    <addaction name="actionAbout"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuOutput">
@@ -545,16 +552,12 @@
     </property>
     <addaction name="actionClear_Analysis"/>
     <addaction name="actionClear_History"/>
-   </widget>
-   <widget class="QMenu" name="menuAbout">
-    <property name="title">
-     <string>About</string>
-    </property>
+    <addaction name="actionSave_History_List"/>
    </widget>
    <addaction name="menuPassword"/>
    <addaction name="menuOutput"/>
-   <addaction name="menuAbout"/>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNew_Password">
    <property name="text">
     <string>New Password</string>
@@ -576,6 +579,16 @@
   <action name="actionClear_Analysis">
    <property name="text">
     <string>Clear current analysis</string>
+   </property>
+  </action>
+  <action name="actionSave_History_List">
+   <property name="text">
+    <string>Save History List</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>
